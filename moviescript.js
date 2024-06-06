@@ -18,7 +18,7 @@ async function fetchMovieDetails() {
   const tagline = movie.tagline || "N/A";
   const overview = movie.overview || "N/A";
   const status = movie.status || "N/A";
-  const runtime = data.runtime ? `${data.runtime} min` : 'N/A';
+  const runtime = movie.runtime ? `${movie.runtime} min` : "N/A"; // Include runtime
   const director =
     movie.credits.crew.find((person) => person.job === "Director")?.name ||
     "N/A";
@@ -39,10 +39,10 @@ async function fetchMovieDetails() {
 | Year          | ${year}        |
 | Genre         | ${genres}      |
 | Age Rating    | ${ageRating}   |
-| Runtime       | ${runtime}     |
 | Tagline       | ${tagline}     |
 | Overview      | ${overview}    |
 | Status        | ${status}      |
+| Runtime          | ${runtime}     |
 | Director      | ${director}    |
 | Writer        | ${writer}      |
 | Top Billed Cast | ${topBilledCast} |
