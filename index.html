@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TMDB Detailed Info</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <div class="container">
-        <h1>TMDB Detailed Info</h1>
-        <label for="type">Select Type:</label>
-        <select id="type">
-            <option value="movie">Movie</option>
-            <option value="tv">TV Show</option>
-        </select>
-        <br>
-        <button onclick="fetchDetails()">Fetch Details</button>
-        <pre id="markdown"></pre>
-        <button onclick="copyMarkdown()">Copy as Markdown</button>
+      <h1>TMDB Data</h1>
+      <label for="type">Select Type:</label>
+      <select id="type">
+        <option value="movie">Movie</option>
+        <option value="tv">TV Show</option>
+      </select>
+      <br />
+      <button onclick="fetchDetails()">Fetch Details</button>
+      <pre id="markdown"></pre>
+      <button onclick="copyMarkdown()">Copy as Markdown</button>
     </div>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
