@@ -1,25 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TMDB Detailed Info</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDb Backdrop Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #search-form {
+            margin-bottom: 20px;
+        }
+        .backdrop-preview {
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .backdrop-preview img {
+            max-width: 150px;
+            max-height: 84px;
+            border-radius: 8px;
+        }
+        .backdrop-preview:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
     <div class="container">
-      <h1>TMDB Data</h1>
-      <label for="type">Select Type:</label>
-      <select id="type">
-        <option value="movie">Movie</option>
-        <option value="tv">TV Show</option>
-      </select>
-      <br />
-      <button onclick="fetchDetails()">Fetch Details</button>
-      <pre id="markdown"></pre>
-      <button onclick="copyMarkdown()">Copy as Markdown</button>
+        <h1>TMDb Backdrop Search</h1>
+
+        <form id="search-form">
+            <label for="search-type">Search by: </label>
+            <select id="search-type">
+                <option value="name">Name</option>
+                <option value="imdb_id">IMDb ID</option>
+                <option value="tmdb_id">TMDb ID</option>
+            </select>
+            <input type="text" id="search-input" placeholder="Enter search term..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="backdrop-gallery"></div>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+    <script>
+        // Handle the API request and display of backdrops
+        const apiKey = process.env.TMDB_API_KEY; // Using environment variable for the API key
+        
+        document.getElementById("search-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            
+            const searchType = document.getElementById("search-type").value;
+            const searchInput = document.getElementById("search-input").value.trim();
+            
+            if (!searchInput) return alert("Please enter a search term.");
+
+            let searchUrl = '';
+            if (searchType === 'name') {
+                searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchInput}`;
+            } else if (searchType === 'imdb_id') {
+                searchUrl = `https://api.themoviedb.org/3/find/${searchInput}?api_key=${apiKey}&external_source=imdb_id`;
+            } else if (searchType === 'tmdb_id') {
+                searchUrl = `https://api.themoviedb.org/3/movie/${searchInput}?api_key=${apiKey}`;
+            }
+
+            const response = await fetch(searchUrl);
+            const data = await response.json();
+            
+            if (data.results) {
+                const movieId = data.results[0].id;
+                fetchBackdrops(movieId);
+            } else if (data.movie_results) {
+                const movieId = data.movie_results[0].id;
+                fetchBackdrops(movieId);
+            }
+        });
+
+        async function fetchBackdrops(movieId) {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/images?api_key=${apiKey}`);
+            const data = await response.json();
+
+            const backdropGallery = document.getElementById("backdrop-gallery");
+            backdropGallery.innerHTML = ''; // Clear the gallery before adding new images
+
+            const backdrops = data.backdrops;
+            const maxBackdrops = 20; // You can set the maximum number of backdrops you want
+
+            backdrops.slice(0, maxBackdrops).forEach(backdrop => {
+                const backdropElement = document.createElement("div");
+                backdropElement.classList.add("backdrop-preview");
+                backdropElement.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${backdrop.file_path}" alt="Backdrop">`;
+                backdropElement.addEventListener("click", function () {
+                    const originalUrl = `https://image.tmdb.org/t/p/original${backdrop.file_path}`;
+                    copyToClipboard(originalUrl);
+                });
+                backdropGallery.appendChild(backdropElement);
+            });
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = text;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Copied to clipboard: " + text);
+        }
+    </script>
+</body>
 </html>
